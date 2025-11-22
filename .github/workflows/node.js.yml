@@ -20,27 +20,17 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        # Point caching to backend
+        cache-dependency-path: backend/package-lock.json
 
-    # Install dependencies
-    - name: Install Packages
-      run: npm install
-
-    # Start your server
-    - name: Start Server
+    # Install dependencies from backend
+    - name: Install Dependencies
       run: |
-        nohup node server.js > server.log 2>&1 &
-        sleep 5   # wait for server to start
+        cd backend
+        npm ci
 
-    # (Optional) Run tests
-    # - name: Run Tests
-    #   run: npm test
-
-    # Stop server after tests
-    - name: Stop Server
+    # Build backend (if build script exists)
+    - name: Build
       run: |
-        pkill node || true
-
-    # Show server logs if something fails
-    - name: Server Logs (if failed)
-      if: failure()
-      run: cat server.log
+        cd backend
+        npm run build --if-present
