@@ -21,26 +21,25 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    # Install dependencies
+    # Install dependencies inside backend folder
     - name: Install Packages
-      run: npm install
+      run: |
+        cd backend
+        npm install
 
-    # Start your server
+    # Start server from backend folder
     - name: Start Server
       run: |
-        nohup node server.js > server.log 2>&1 &
-        sleep 5   # wait for server to start
+        cd backend
+        nohup node server.js > ../server.log 2>&1 &
+        sleep 5
 
-    # (Optional) Run tests
-    # - name: Run Tests
-    #   run: npm test
-
-    # Stop server after tests
+    # Stop server
     - name: Stop Server
       run: |
         pkill node || true
 
-    # Show server logs if something fails
+    # Show logs if any step failed
     - name: Server Logs (if failed)
       if: failure()
       run: cat server.log
