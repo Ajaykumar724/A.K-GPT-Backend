@@ -1,0 +1,46 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    # Install dependencies
+    - name: Install Packages
+      run: npm install
+
+    # Start your server
+    - name: Start Server
+      run: |
+        nohup node server.js > server.log 2>&1 &
+        sleep 5   # wait for server to start
+
+    # (Optional) Run tests
+    # - name: Run Tests
+    #   run: npm test
+
+    # Stop server after tests
+    - name: Stop Server
+      run: |
+        pkill node || true
+
+    # Show server logs if something fails
+    - name: Server Logs (if failed)
+      if: failure()
+      run: cat server.log
