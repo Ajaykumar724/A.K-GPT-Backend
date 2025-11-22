@@ -11,7 +11,7 @@ passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: '/auth/oauth2/redirect/google',
-    scope: ['openid', 'profile', 'email']
+    scope: ['profile']
 }, async function verify(issuer, profile, cb) {
     try {
         let user = await User.findOne({ googleId: profile.id });
@@ -32,12 +32,8 @@ passport.use(new GoogleStrategy({
 }
 ));
 
-authRouter.get(
-  '/login/federated/google',
-  passport.authenticate('google', {
-    scope: ['openid', 'profile', 'email']
-  })
-);
+
+authRouter.get('/login/federated/google', passport.authenticate('google'));
 
 authRouter.get('/oauth2/redirect/google', passport.authenticate('google', {
     successRedirect: 'https://a-k-gpt-7qx2.onrender.com/',
