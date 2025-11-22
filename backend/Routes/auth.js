@@ -35,8 +35,8 @@ passport.use(new GoogleStrategy({
 authRouter.get('/login/federated/google', passport.authenticate('google'));
 
 authRouter.get('/oauth2/redirect/google', passport.authenticate('google', {
-    successRedirect: 'http://localhost:5173/',
-    failureRedirect: 'http://localhost:5173/'
+    successRedirect: 'https://a-k-gpt-7qx2.onrender.com/',
+    failureRedirect: 'https://a-k-gpt-7qx2.onrender.com/'
 }));
 
 passport.serializeUser(function(user,cb) {
@@ -66,7 +66,7 @@ authRouter.get("/status",(req,res)=>{
 authRouter.get('/logout', function(req, res, next) {
   req.logout(function(err) {
     if (err) { return next(err); }
-    res.redirect('http://localhost:5173/');
+    res.redirect('https://a-k-gpt-7qx2.onrender.com/');
   });
 });
 

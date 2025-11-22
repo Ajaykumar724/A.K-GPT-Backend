@@ -20,7 +20,7 @@ const port = 8080;
 
 app.use(express.json());
 app.use(cors({
-  origin: 'https://a-k-gpt-7qx2.onrender.com/',
+  origin: 'https://a-k-gpt-7qx2.onrender.com',
   credentials : true
 }));
 
