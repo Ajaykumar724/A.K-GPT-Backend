@@ -20,7 +20,7 @@ const port = 8080;
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'https://a-k-gpt-7qx2.onrender.com/',
   credentials : true
 }));
 
