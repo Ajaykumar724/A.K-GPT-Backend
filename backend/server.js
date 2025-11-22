@@ -71,6 +71,11 @@ app.use(passport.session());
   // }
 // });
 
+
+app.get("/", (req,res) => {
+  res.send({msg : "hello world"});
+})
+
 app.use('/api', router);
 app.use('/auth', authRouter);
 
