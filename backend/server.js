@@ -73,7 +73,7 @@ app.use(passport.session());
 
 
 app.get("/", (req,res) => {
-  res.send({msg : "hello world"});
+  res.send({msg : "A.K GPT backend running"});
 })
 
 app.use('/api', router);
