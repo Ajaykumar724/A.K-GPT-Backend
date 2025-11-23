@@ -36,7 +36,7 @@ passport.use(new GoogleStrategy({
 authRouter.get('/login/federated/google', passport.authenticate('google'));
 
 authRouter.get('/oauth2/redirect/google', passport.authenticate('google', {
-    successRedirect: 'https://a-k-gpt-7qx2.onrender.com/',
+    successRedirect: 'http://a-k-gpt-7qx2.onrender.com/',
     failureRedirect: 'https://a-k-gpt-7qx2.onrender.com/'
 }));
 
