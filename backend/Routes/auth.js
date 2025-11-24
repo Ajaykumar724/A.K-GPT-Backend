@@ -2,73 +2,73 @@ import 'dotenv/config';
 import express from 'express';
 import passport from 'passport';
 import GoogleStrategy from 'passport-google-oidc';
-import mongoose from 'mongoose';
 import User from '../models/User.js';
 
 const authRouter = express.Router();
 
+// Google OAuth Strategy
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/oauth2/redirect/google',
-    scope: ['profile']
-}, async function verify(issuer, profile, cb) {
+    callbackURL: 'https://a-k-gpt-backend.onrender.com/auth/oauth2/redirect/google',
+    scope: ['profile', 'email']
+}, 
+async function verify(issuer, profile, cb) {
     try {
+        let email = profile.emails?.[0]?.value;
+
         let user = await User.findOne({ googleId: profile.id });
 
         if (!user) {
             user = await User.create({
                 name: profile.displayName,
                 googleId: profile.id,
+                email: email || ""
             });
         }
-
-        console.log("User:", user);
 
         return cb(null, user);
     } catch (err) {
         return cb(err);
     }
-}
-));
-
-
-authRouter.get('/login/federated/google', passport.authenticate('google'));
-
-authRouter.get('/oauth2/redirect/google', passport.authenticate('google', {
-    successRedirect: 'http://a-k-gpt-7qx2.onrender.com/',
-    failureRedirect: 'https://a-k-gpt-7qx2.onrender.com/'
 }));
 
-passport.serializeUser(function(user,cb) {
-    process.nextTick(function() {
-        cb(null, { id: user.id})
-    });
-});
 
-passport.deserializeUser(function(user,cd){
-    process.nextTick(function() {
-        return cd(null, user);
-    });
-});
+// Google Login
+authRouter.get('/login/federated/google', passport.authenticate('google'));
 
-authRouter.get('/login', (req, res, next) => {
-    res.render('login.ejs');
-});
+// Google Redirect
+authRouter.get('/oauth2/redirect/google', 
+    passport.authenticate('google', {
+        successRedirect: 'https://a-k-gpt-7qx2.onrender.com/',
+        failureRedirect: 'https://a-k-gpt-7qx2.onrender.com/'
+    })
+);
 
-authRouter.get("/status",(req,res)=>{
-    if(req.isAuthenticated()) {
-        res.json({isLoggedin: true, user: req.user});
+
+// Passport session handling
+passport.serializeUser((user, cb) => cb(null, { id: user.id }));
+passport.deserializeUser((obj, cb) => cb(null, obj));
+
+
+// Status Route
+authRouter.get("/status", (req, res) => {
+    if (req.isAuthenticated()) {
+        res.json({ isLoggedin: true, user: req.user });
     } else {
-        res.json({isLoggedin: false});
+        res.json({ isLoggedin: false });
     }
-})
+});
 
-authRouter.get('/logout', function(req, res, next) {
-  req.logout(function(err) {
-    if (err) { return next(err); }
-    res.redirect('https://a-k-gpt-7qx2.onrender.com/');
-  });
+
+// Logout
+authRouter.get('/logout', (req, res) => {
+    req.logout(() => {
+        req.session.destroy(() => {
+            res.clearCookie('connect.sid');
+            res.redirect('https://a-k-gpt-7qx2.onrender.com/');
+        });
+    });
 });
 
 export default authRouter;
